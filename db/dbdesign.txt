@@ -1,0 +1,36 @@
+Orders
+--------
+OrderID. : bigint
+ReceiptNo. : bigint
+Date. : DATE
+FirstName : varchar
+LastName : varchar
+Card No. : bigint
+TotalCost : float
+Active : bool
+
+CREATE TABLE Orders (
+    OrderID BIGINT(15) NOT NULL,
+    ReceiptNo BIGINT(10) NOT NULL,
+    Date DATE,
+    FirstName VARCHAR(20) NOT NULL
+    LastName VARCHAR(20) NOT NULL,
+    Card No VARCHAR(16) NOT NULL,
+    TotalCost FLOAT NOT NULL,
+    ACTIVE BOOLEAN, NOT NULL
+    STATUS VARCHAR, NOT NULL
+);
+Items
+--------
+itemID : bigint 
+itemName : varchar
+itemCost : float
+orderParent : bigint
+specialNote : varchar
+
+MenuItems
+-------------
+menuItemID : bigint
+itemName : varchar 
+itemCost : varchar 
+photoURL : varchar 

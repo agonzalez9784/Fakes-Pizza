@@ -1,0 +1,44 @@
+<html>
+    <head>
+        {% include 'components/bootstrap.html' %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid" style="height:100%;">
+            <div class="row">
+              <div class="col col-lg-1" id="viewController">
+                <a class="btn" href="/admin"> Home </a>
+                <a class="btn" onClick="renderOrdersTable()">Orders</a>
+              </div>
+              <div class="col" id="view">
+                <canvas id="salesPerMonthChart">
+
+                </canvas>
+              
+              </div>
+            </div>
+        </div>
+        
+        <script src="/admin/res/admin.js" type="text/javascript"></script>
+        <script src="/admin/res/cdnchart.js" type="text/javascript"></script>
+        <script type="text/javascript">
+          const salesPerMonthChartCTX = document.getElementById("salesPerMonthChart");
+
+          new Chart(salesPerMonthChartCTX, {
+            type: 'bar',
+            data: {
+              labels: ['Jan','Feb', 'Mar', 'Apr', "May", "Jun", 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+              datasets: [{
+                label: '# of Votes',
+                data: [1,0,0,1,0,0,0,1,0,0,0,0],
+                borderWidth: 1
+              }]
+            }
+          });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+<html>
+    <head>
+        {% include 'components/bootstrap.html' %}
+    </head>
+    <body style="background: url('/static/background.png');">
+        {% include 'components/navbar.html' %}
+        
+
+        <br />
+        <div class="card d-flex justify-content-center align-items-center" style="width: 18rem; height:100%; background-color:white;">
+        <h2>Your Order</h2>
+        <table class="table" style="width:50%;">
+            <thead>
+                <tr>
+                <th scope="col">Menu Item</th>
+                <th scope="col">Price</th>
+                </tr>
+            </thead>
+            {%for item in orderItems%}
+                <tr>
+                    <td>{{ menu[item].getItemName() }}</td>
+                    <td>{{ menu[item].getPrice() }}</td>
+                </tr>
+            {%endfor%}
+        </table>
+        
+        <h4>${{ totalcost }}</h4>
+        <h5>Status: {{ orderstatus }}</h5>
+        </div>
+        
+    </body>
+</html>

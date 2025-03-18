@@ -1,0 +1,22 @@
+<html>
+    <head>
+        {% include 'components/bootstrap.html' %}
+    </head>
+    <body style="background: url('static/background.png')">
+        {% include 'components/navbar.html' %}
+        
+        <div class="container">
+            <!-- Content here -->
+            <div class="row align-items">
+                {%for item in menu.values()%}
+                <div class="col">
+                    {%include 'components/orderCard.html'%}                
+                </div>
+                {%endfor%}
+
+                
+            </div>
+        </div>
+        {% include 'components/footer.html' %}
+    </body>
+</html>
