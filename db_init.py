@@ -18,6 +18,15 @@ def db_init():
                     );
                    """)
     
+    cursor.execute("""
+                    CREATE TABLE ReceiptItems(
+                        ReceiptNo BIGINT(10) NOT NULL,
+                        OrderID BIGINT(15) NOT NULL,
+                        ItemID BIGINT(10),
+                        ItemName VARCHAR(25),
+                        ItemCost FLOAT
+                    );
+                   """)
     conn.commit()
     conn.close()
 

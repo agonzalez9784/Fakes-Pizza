@@ -12,6 +12,25 @@ app.secret_key = "HI"
 
 order = {}
 
+
+def addItemToReceipt(receiptNo, orderID, itemID, itemName, itemPrice):
+    conn = sqlite3.connect("db/pizzadb.db")
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO ReceiptItems (ReceiptNo, OrderID, ItemID, ItemName, ItemCost) VALUES (?, ?, ?, ?, ?);",
+                   (receiptNo, orderID, itemID, itemName, itemPrice))
+    
+
+    conn.commit()
+    conn.close()
+
+def addReceiptToDatabase(receiptNo, orderID, cart):
+
+    for items in cart.getItems():
+        item = menuData[items]
+        addItemToReceipt(receiptNo, orderID, item.getItemID(), item.getItemName(), item.getPrice())
+
+
 def addOrderToDatabase(orderID, receiptNo, date, firstName, lastName, cardNo, totalCost, status):
     conn = sqlite3.connect("db/pizzadb.db")
     cursor = conn.cursor()
@@ -187,16 +206,17 @@ def processOrder():
     cardholder_zipcode = request.args.get("cardhold_zip")
 
     #validation
-    if(len(first_name) < 5):
+    '''
+    if(len(first_name) < 1):
         return redirect("checkout")
-    if(len(last_name) < 5):
-        return redirect("checkout")
-    
-    if(len(card_no) != 16):
-        return redirect("checkout")
-    if(len(cvv) != 3):
+    if(len(last_name) < 1):
         return redirect("checkout")
     
+    if(len(card_no) != 5):
+        return redirect("checkout")
+    if(len(cvv) != 2):
+        return redirect("checkout")
+    '''
     receiptNo = gen_ran_numbers(10)
     orderID = gen_ran_chars(35)
     totalCost = carts[session['cartID']].total()
@@ -204,8 +224,10 @@ def processOrder():
     now = datetime.now()
     date = now.strftime('%Y-%m-%d %H:%M:%S')
 
+
     addOrderToDatabase(orderID, receiptNo, date, first_name, last_name, card_no, totalCost, True) #TRUE basically meaning the order is active which by default should be
                                                                                                   #since the order was just made 
+    addReceiptToDatabase(receiptNo, orderID, carts[session['cartID']])
 
     session['currentOrder'] = orderID
     order[orderID] = Order(orderID,carts[session['cartID']])

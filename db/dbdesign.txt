@@ -20,6 +20,18 @@ CREATE TABLE Orders (
     ACTIVE BOOLEAN, NOT NULL
     STATUS VARCHAR, NOT NULL
 );
+
+
+RECEIPT 
+
+CREATE TABLE RECEIPT_ITEMS(
+    ReceiptNo BIGINT(10) NOT NULL,
+    ItemID BIGINT(10),
+    ItemName VARCHAR(25),
+    ItemCost FLOAT
+)
+
+
 Items
 --------
 itemID : bigint 
