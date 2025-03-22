@@ -351,6 +351,10 @@ def get_salesdata():
     rows = cursor.fetchall()
 
     mos = {1:'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
+    # SELECT COUNT(OrderID), SUM(TotalCost), strftime('%m', Date) AS Month FROM ORDERS GROUP BY Month;
+    # SELECT ItemName, COUNT(ReceiptNo) FROM ReceiptItems GROUP BY ItemName;
+    # SELECT ItemName, COUNT(ItemName), strftime('%m', Date) AS Month FROM ReceiptItems LEFT JOIN Orders ON ReceiptItems.OrderID = Orders.OrderID GROUP BY ItemName;
+
     for row in rows:
         rowData = {'orderID': row[0], 
                 'receiptNo.': row[1], 
@@ -376,7 +380,12 @@ def get_salesdata():
     salesData = {'totalRevenue': totalRevenue, 'noSales': noSales, 'revenuePerMonth': revenuePerMonth, 'noSalesPerMonth': noSalesPerMonth}
 
     return salesData
-    
+@app.route("/admin/action/getItemData")
+def get_itemdata():
+    itemsData = {}
+
+    return itemsData
+
 @app.route("/admin/actions/getOrders")
 def admin_getorders():
     
