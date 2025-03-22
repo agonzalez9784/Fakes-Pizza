@@ -25,11 +25,25 @@
                 <canvas id="incomePerMonthChart">
 
                 </canvas>
+                <h3> Items Count Pi Chart Total</h3>
                 <canvas id="mostPopularItemsPiChart">
 
                 </canvas>
-                <canvas id="mostPopularItemsPerMonth">
-
+                <h3>Items Count Per Month</h3>
+                <div id="mostPopularItemsPerMonth">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Item Name</th>
+                        <th scope="col">Month</th>
+                        <th scope="col">Count</th>
+                      </tr>
+                    </thead>
+                    <tbody id="mpipmItem">
+                      
+                    </tbody>
+                  </table>
                 </canvas>
               </div>
             </div>
@@ -45,7 +59,6 @@
           const mostPopularItemsPerMonthCTX = document.getElementById("mostPopularItemsPerMonth");
          
           
-          
           function getSalesData()
           {
               return $.ajax({
@@ -54,6 +67,13 @@
               });
           }
 
+          function getItemData()
+          {
+            return $.ajax({
+              url:"admin/action/getItemData",
+              type: "GET"
+            });
+          }
           async function loadData()
           {
             const salesData = await getSalesData();
@@ -62,6 +82,7 @@
 
             document.getElementById("totalrevenue").innerHTML = "$"+String(salesData['totalRevenue']);
             document.getElementById("nosalesannum").innerHTML = "$"+String(salesData['noSales']);
+
             new Chart(salesPerMonthChartCTX, {
               type: 'bar',
               data: {
@@ -108,6 +129,23 @@
               }
             });
 
+            const itemData = await getItemData();
+
+            new Chart(mostPopularItemsPiChartCTX, {
+              type: 'doughnut',
+              data: {
+                labels: itemData['totalItemCount']['labels'],
+                datasets: [{
+                  label: 'Revenue Per Month',
+                  data: itemData['totalItemCount']['values'],
+                  borderWidth: 0.5
+                }]
+              }
+            });
+            itemData['itemsCountPerMonth'].forEach(items => {
+              document.getElementById("mpipmItem").innerHTML+="<tr><td></td><td>"+items[0]+"</td><td>"+items[2]+"</td><td>"+items[1]+"</td></tr>"
+            });
+            
           }
 
           loadData();

@@ -352,8 +352,6 @@ def get_salesdata():
 
     mos = {1:'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
     # SELECT COUNT(OrderID), SUM(TotalCost), strftime('%m', Date) AS Month FROM ORDERS GROUP BY Month;
-    # SELECT ItemName, COUNT(ReceiptNo) FROM ReceiptItems GROUP BY ItemName;
-    # SELECT ItemName, COUNT(ItemName), strftime('%m', Date) AS Month FROM ReceiptItems LEFT JOIN Orders ON ReceiptItems.OrderID = Orders.OrderID GROUP BY ItemName;
 
     for row in rows:
         rowData = {'orderID': row[0], 
@@ -380,11 +378,51 @@ def get_salesdata():
     salesData = {'totalRevenue': totalRevenue, 'noSales': noSales, 'revenuePerMonth': revenuePerMonth, 'noSalesPerMonth': noSalesPerMonth}
 
     return salesData
+
 @app.route("/admin/action/getItemData")
 def get_itemdata():
+
     itemsData = {}
 
-    return itemsData
+
+    #i don't care if it's ugly rn, i'm going to do a major refactor in the near future, so this will be fine for now.
+
+    conn = sqlite3.connect("db/pizzadb.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT ItemName, COUNT(ReceiptNo) FROM ReceiptItems GROUP BY ItemName;')
+
+    rows = cursor.fetchall()
+
+    labels = []
+    values = []
+    for row in rows:
+        labels.append(row[0])
+        values.append(row[1])
+
+    data1 = {'labels': labels, 'values': values}
+    
+    conn.commit()
+    conn.close()
+    
+    conn = sqlite3.connect("db/pizzadb.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT ItemName, COUNT(ItemName), strftime('%m', Date) AS Month FROM ReceiptItems LEFT JOIN Orders ON ReceiptItems.OrderID = Orders.OrderID GROUP BY ItemName;")
+    rows = cursor.fetchall()
+    data2 = []
+    for row in rows:
+        data2.append((row[0], row[1], row[2]))
+
+    conn.commit()
+    conn.close()
+
+    # SELECT ItemName, COUNT(ReceiptNo) FROM ReceiptItems GROUP BY ItemName;
+    # SELECT ItemName, COUNT(ItemName), strftime('%m', Date) AS Month FROM ReceiptItems LEFT JOIN Orders ON ReceiptItems.OrderID = Orders.OrderID GROUP BY ItemName;
+
+    return {'totalItemCount': data1, 'itemsCountPerMonth': data2}
 
 @app.route("/admin/actions/getOrders")
 def admin_getorders():
