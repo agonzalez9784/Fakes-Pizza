@@ -1,8 +1,22 @@
 <html>
     <head>
         <title>Login - Admin Portal</title>
+        {% include 'components/bootstrap.html' %}
     </head>
     <body>
-
+        <div id="loginbox"  style="width: 500px; height: 300px; border: 1px solid gray; border-radius:5px; position:relative; left: 30vw; top:10vw;">
+            <form action="/admin/auth" method="GET" style="padding-top:40px;">
+                <center>
+                <h3>Login</h3>
+                <label>Username:</label><input type="text" name="username" /> <br />
+                <label>Password:</label><input type="text" name="password" /> <br />
+                <br />
+                <input class="btn btn-primary"  type="submit" value="Login" />
+                </center>
+    
+            </form>
+        </div>
+        
+        
     </body>
 </html>
