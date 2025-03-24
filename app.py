@@ -130,7 +130,13 @@ class Cart:
             return True
 
         return False
+    def getCart(self):
+        return self.cart 
 
+    def setCart(self, cart):
+        self.cart = cart
+    def clear(self):
+        self.cart = []
 
 carts = {}
 
@@ -221,6 +227,7 @@ def processOrder():
     receiptNo = gen_ran_numbers(10)
     orderID = gen_ran_chars(35)
     totalCost = carts[session['cartID']].total()
+    
 
     now = datetime.now()
     date = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -231,9 +238,10 @@ def processOrder():
     addReceiptToDatabase(receiptNo, orderID, carts[session['cartID']])
 
     session['currentOrder'] = orderID
-    order[orderID] = Order(orderID,carts[session['cartID']])
-
-    
+    newCart = Cart()
+    newCart.setCart(carts[session['cartID']].getCart())
+    order[orderID] = Order(orderID,newCart)
+    carts[session['cartID']].clear()
 
     return redirect('/order') #unsafe fix later
 
