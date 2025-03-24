@@ -114,8 +114,17 @@ class Cart:
 
         return serial 
     
-    def removeItem(self):
-        pass
+    def removeItem(self, id: str):
+        chopList = ""
+
+        for i in range(len(self.cart)):
+            if(str(self.cart[i]) == id):
+                chopList = i
+
+        self.cart.pop(chopList)
+
+
+
 
     def total(self):
         totalPrice = 0.00
@@ -195,6 +204,14 @@ def addToCart():
     carts[session['cartID']].addToCart(str(itemID))
 
     return redirect("/menu")
+
+@app.route("/removeFromCart")
+def removeFromCart():
+    verifyCarts()
+    itemID = request.args.get("id")
+    carts[session['cartID']].removeItem(str(itemID))
+
+    return redirect("cart")
 
 @app.route("/checkout")
 def checkout():
