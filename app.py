@@ -230,17 +230,17 @@ def processOrder():
     cardholder_zipcode = request.args.get("cardhold_zip")
 
     #validation
-    '''
+    
     if(len(first_name) < 1):
         return redirect("checkout")
     if(len(last_name) < 1):
         return redirect("checkout")
     
-    if(len(card_no) != 5):
+    if(len(card_no) != 16):
         return redirect("checkout")
-    if(len(cvv) != 2):
+    if(len(cvv) != 3):
         return redirect("checkout")
-    '''
+    
     receiptNo = gen_ran_numbers(10)
     orderID = gen_ran_chars(35)
     totalCost = carts[session['cartID']].total()
