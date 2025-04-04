@@ -46,6 +46,33 @@ function updateOrder(orderID)
     }
 }
 
+function updateMenu(ItemID)
+{
+    ItemName = document.getElementById("ItemName").value;
+    ItemCost = document.getElementById("ItemCost").value;
+    ItemImageURL = document.getElementById("ItemImageURL").value;
+
+    const result = confirm("Are you sure you want to do this?");
+
+    if(result){
+        return $.ajax({
+            url: '/admin/actions/updateMenu',
+            data: {
+                   'ItemID': ItemID,
+                   'ItemName': ItemName,
+                   'ItemCost': ItemCost,
+                   'ItemImageURL': ItemImageURL
+            },
+            type: "GET",
+            success: function(result){
+                destroyModal();
+                renderMenuTable();
+            }
+        });
+        
+    }
+}
+
 function deleteOrder(orderID)
 {
     const confirmation = confirm("Are you sure that you want to delete this order?")
@@ -63,6 +90,25 @@ function deleteOrder(orderID)
     
     
 }
+
+function deleteItem(itemID)
+{
+    const confirmation = confirm("Are you sure that you want to delete this order?")
+    
+    if(confirmation)
+    {
+        return $.ajax({
+            url: '/admin/actions/deleteMenuItem/'+itemID,
+            type: "GET",
+            success: function(result){
+                renderMenuTable();
+            }
+        });
+    }
+    
+    
+}
+
 function destroyModal()
 {
     const elementMBB = document.getElementById("modalBackgroundBlur");
@@ -103,12 +149,70 @@ function createModal(orderID, receiptNo, first_name, last_name, cardNo, totalCos
                             </center>`;
 }
 
+function createMenuModal(ItemID, ItemName, ItemCost, ItemImageURL)
+{
+    const modalBackgroundBlur = document.createElement("div");
+    modalBackgroundBlur.id="modalBackgroundBlur";
+    modalBackgroundBlur.style="position: absolute; background-color: rgba(0, 0, 0, 0.48); width:100vw; height:100vh; left:0px; top: 0px;";
+
+    document.body.appendChild(modalBackgroundBlur);
+    const elementMBB = document.getElementById("modalBackgroundBlur");
+    
+    elementMBB.innerHTML = `
+                            <center> 
+                                <div id='testbox' style='position: relative; top: 100px; width:50%; background-color:white; '>
+                                <table>
+                                    ItemName: <input type='text' style='width:50%;' value='${ItemName}' id='ItemName'/><br />
+                                    ItemCost: <input type='text' style='width:50%;' value='${ItemCost}' id='ItemCost'/><br />
+                                    ItemImageURL: <input type='text' style='width:50%' value='${ItemImageURL}' id='ItemImageURL'/> <br/>
+                                </table>
+                                    <table>
+                                        <tr>
+                                            <th><a class='btn btn-primary' onclick="updateMenu('${ItemID}');"> Submit </a> </th>
+                                            <th><a class='btn btn-danger' onclick='destroyModal();'> Cancel </a> </th>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                            </center>`;
+}
+
 function getOrderData()
 {
     return $.ajax({
         url: '/admin/actions/getOrders',
         type: "GET"
     });
+}
+
+function getMenuData()
+{
+    return $.ajax({
+        url: "/admin/action/getMenuData",
+        type: "GET"
+    });
+}
+/* 
+                    CREATE TABLE Item(
+                    ItemID BIGINT(10),
+                    ItemName VARCHAR(25),
+                    ItemCost FLOAT
+                   );
+*/
+function makeItemCard(ItemID, ItemName, ItemCost, ItemImageURL)
+{
+    const itemCard = `
+                        <tr>
+                            <td> ${ItemID} </td>
+                            <td> ${ItemName} </td>
+                            <td> ${ItemCost} </td>
+                            <td> ${ItemImageURL} </td>
+                        </tr>
+                        <td> <a class='btn btn-primary' onClick="createMenuModal('${ItemID}', '${ItemName}', '${ItemCost}', '${ItemImageURL}');"> Edit </a> </td>
+                        <td> <a class='btn btn-danger' onClick="deleteItem('${ItemID}');"> Delete </a> </td>
+                     `;
+
+    return itemCard;
 }
 function makeOrderCard(orderID, receiptNo, first_name, last_name, cardNo, totalCost, date, active, status)
 {
@@ -123,13 +227,44 @@ function makeOrderCard(orderID, receiptNo, first_name, last_name, cardNo, totalC
                             <td> ${date} </td>
                             <td> ${active} </td>
                             <td> ${status} </td>
+                        </tr>
                             <td> <a class='btn btn-primary' onClick="createModal('${orderID}', '${receiptNo}', '${first_name}', '${last_name}', '${cardNo}', '${totalCost}', '${date}', '${active}', '${status}');"> Edit </a> </td>
                             <td> <a class='btn btn-danger' onClick="deleteOrder('${orderID}');"> Delete </a> </td>
-                        </tr>
+                        x
                       `;
     return orderCard;
 }
 
+async function renderMenuTable()
+{
+    clear();
+    let menuData = await getMenuData();
+    console.log(menuData);
+    let items = "";
+
+    for(let k in menuData)
+    {
+        d = menuData[k];
+        items = items + makeItemCard(d['ItemID'], d['ItemName'], d['ItemCost'], d['ItemImageURL']);
+    }
+
+    const table = `
+                    <table class='table'>
+                        <tr>
+                            <th> ItemID </th>
+                            <th> ItemName </th>
+                            <th> ItemCost </th>
+                            <th> ItemImageURL </th>
+                        </tr>
+
+                        <tbody>
+                            ${items}
+                        </tbody>
+                    </table>
+                  `;
+    
+    render(table);
+}
 
 async function renderOrdersTable()
 {

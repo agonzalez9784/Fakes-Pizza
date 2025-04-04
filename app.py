@@ -14,6 +14,27 @@ app.secret_key = "HI"
 order = {}
 
 
+
+def initMenu():
+
+    conn = sqlite3.connect("db/pizzadb.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM Item;')
+
+    rows = cursor.fetchall()
+
+    clearMenu()
+        
+    for row in rows:            
+        addMenuItem(row[0], row[1], row[2], row[3])
+
+    conn.commit()
+    conn.close()
+
+
+
 def addItemToReceipt(receiptNo, orderID, itemID, itemName, itemPrice):
     conn = sqlite3.connect("db/pizzadb.db")
     cursor = conn.cursor()
@@ -97,6 +118,16 @@ menuData = {'123': MenuItem(123, "Cheese Pizza", 10.99, "static/cheese_pizza.png
         '331': MenuItem(331, "Calzone", 7.99), 
         '221': MenuItem(221, "Brownie", 8.99) }
 
+
+def addMenuItem(itemID, itemName, itemCost, itemImageURL):
+    print(itemImageURL)
+    menuData.update({str(itemID): MenuItem(str(itemID), itemName, itemCost, itemImageURL)})
+    print(menuData)
+
+def clearMenu():
+
+    menuData.clear()
+
 class Cart:
 
     def __init__(self):
@@ -148,6 +179,8 @@ class Cart:
         self.cart = []
 
 carts = {}
+
+initMenu()
 
 def verifyCarts():
     try:
@@ -331,6 +364,21 @@ def admin_login():
     
     return render_template('admin/login.html')
 
+@app.route("/admin/actions/deleteMenuItem/<itemID>")
+def admin_deletemenuitem(itemID):
+    if(session['adminAuth']):
+        print("Request received")
+        conn = sqlite3.connect("db/pizzadb.db")
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM Item WHERE ItemID = ?;", (itemID,))
+
+        conn.commit()
+        conn.close()
+
+        return "200"
+
+    return redirect('/admin/login')
 @app.route("/admin/actions/deleteOrder/<orderID>")
 def admin_deleteorder(orderID):
 
@@ -347,6 +395,26 @@ def admin_deleteorder(orderID):
         return "test"
 
     return redirect('/admin/login')
+
+@app.route("/admin/actions/updateMenu")
+def updateMenu():
+
+    if(session['adminAuth']):
+        ItemID = request.args.get('ItemID')
+        ItemName = request.args.get("ItemName")
+        ItemCost = request.args.get("ItemCost")
+        ItemImageURL = request.args.get("ItemImageURL")
+
+        conn = sqlite3.connect("db/pizzadb.db")
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE Item SET ItemName = ?, ItemCost = ?, ItemImageURL=? WHERE ItemID = ?;", (ItemName, ItemCost,ItemImageURL, ItemID))
+
+        conn.commit()
+        conn.close()
+    
+    return "200"
+
 
 @app.route("/admin/actions/updateOrder")
 def admin_updateorder():
@@ -446,7 +514,41 @@ def authenticate():
     else:
 
         return redirect('/admin/login')
-    
+
+@app.route("/admin/action/getMenuData")
+def get_menudata():
+
+    if(session['adminAuth']):
+
+        data = []
+
+        conn = sqlite3.connect("db/pizzadb.db")
+
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM Item;')
+
+        rows = cursor.fetchall()
+
+        clearMenu()
+
+        for row in rows:
+            rowData = {"ItemID": row[0],
+                       "ItemName": row[1],
+                       "ItemCost": row[2],
+                       "ItemImageURL": row[3]}
+            
+            
+            addMenuItem(row[0], row[1], row[2], row[3])
+            data.append(rowData)
+
+        conn.commit()
+        conn.close()
+
+        return data
+
+    return redirect('/admin/login')
+
 @app.route("/admin/action/getItemData")
 def get_itemdata():
     
